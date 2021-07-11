@@ -1,0 +1,4 @@
+2021-07-09 18:29:25,251 INFO o.s.b.StartupInfoLogger [main] Starting OrderFxApplication using Java 15.0.2 on ManhDD with PID 18492 (E:\spring\OderFx\target\classes started by Manh in E:\spring\OderFx)
+2021-07-09 18:29:25,2512021-07-09 18:29:25,254 DEBUG o.s.b.StartupInfoLogger [main] Running with Spring Boot v2.5.0, Spring v5.3.7
+2021-07-09 18:29:25,2542021-07-09 18:29:25,254 INFO o.s.b.SpringApplication [main] The following profiles are active: dev
+2021-07-09 18:29:25,254
