@@ -1,6 +1,7 @@
 package com.api.orderfx.controller;
 
 import com.api.orderfx.model.fxcm.request.CreateEntryOrderRequest;
+import com.api.orderfx.model.fxcm.request.CreateOrderRequest;
 import com.api.orderfx.service.fxcm.IFxcmApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,11 @@ public class FxcmController {
     }
 
     @PostMapping("/order")
-    public ResponseEntity getOrder(@RequestBody CreateEntryOrderRequest createEntryOrderRequest) throws Exception {
+    public ResponseEntity getOrder(@RequestBody CreateOrderRequest createOrderRequest) throws Exception {
 
-        Object sendPostRequest = iFxcmApi.createOder(createEntryOrderRequest);
+        Object sendPostRequest = iFxcmApi.createOder(createOrderRequest);
         return ResponseEntity.ok(sendPostRequest);
     }
+
+
 }

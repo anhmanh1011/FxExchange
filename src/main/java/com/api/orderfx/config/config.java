@@ -2,6 +2,7 @@ package com.api.orderfx.config;
 
 import com.api.orderfx.RestClientRequest.FxcmHeaderRequestInterceptor;
 import com.api.orderfx.common.MyRestErrorHandler;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,12 @@ import java.util.Objects;
 
 @Configuration
 public class config implements WebMvcConfigurer {
+
+
+    @Bean
+    public BeanUtilsBean beanUtilsBean(){
+        return new NullAwareBeanUtilsBean();
+    }
 
     @Bean
     public ModelMapper modelMapper() {

@@ -15,10 +15,10 @@ public class OrderEntity {
 
     @Basic
     @Column(name = "T")
-    public Integer t;
+    public String t;
     @Basic
     @Column(name = "RATE_PRECISION")
-    public Integer ratePrecision;
+    public String ratePrecision;
     @Basic
     @Column(name = "ORDER_ID")
     public String orderId;
@@ -51,43 +51,43 @@ public class OrderEntity {
     public Double buy;
     @Basic
     @Column(name = "SELL")
-    public Integer sell;
+    public String sell;
     @Basic
     @Column(name = "TYPE")
     public String type;
     @Basic
     @Column(name = "STATUS")
-    public Integer status;
+    public String status;
     @Basic
     @Column(name = "AMOUNTK")
-    public Integer amountK;
+    public String amountK;
     @Basic
-    @Column(name = "CURRENCY_POINTEGER")
-    public Double currencyPoInteger;
+    @Column(name = "CURRENCY_POString")
+    public Double currencyPoString;
 
     @Basic
     @Column(name = "STOP_MOVE")
-    public Integer stopMove;
+    public String stopMove;
 
     @Basic
     @Column(name = "STOP")
-    public Integer stop;
+    public String stop;
 
     @Basic
     @Column(name = "STOPRATE")
-    public Integer stopRate;
+    public String stopRate;
     @Basic
     @Column(name = "`LIMIT`")
-    public Integer limit;
+    public String limit;
     @Basic
     @Column(name = "LIMIT_RATE")
-    public Integer limitRate;
+    public String limitRate;
     @Basic
     @Column(name = "IS_ENTRY_ORDER")
     public Boolean isEntryOrder;
     @Basic
     @Column(name = "O_CO_BULK_ID")
-    public Integer ocoBulkId;
+    public String ocoBulkId;
     @Basic
     @Column(name = "IS_NET_QUANTITY")
     public Boolean isNetQuantity;
@@ -102,23 +102,29 @@ public class OrderEntity {
     public Boolean isELSOrder;
     @Basic
     @Column(name = "STOP_PEGBASE_TYPE")
-    public Integer stopPegBaseType;
+    public String stopPegBaseType;
     @Basic
     @Column(name = "LIMIT_PEGBASE_TYPE")
-    public Integer limitPegBaseType;
+    public String limitPegBaseType;
     @Basic
     @Column(name = "CHILD_TRAILING_STOP")
     public String child_trailingStop;
     @Basic
     @Column(name = "CHILD_TRAILING")
-    public Integer child_trailing;
+    public String child_trailing;
     @Basic
     @Column(name = "TRAILING_STOP")
     public String trailingStop;
     @Basic
     @Column(name = "`TRAILING`")
-    public Integer trailing;
+    public String trailing;
     @Basic
     @Column(name = "`RANGE`")
-    public Integer range;
+    public String range;
+
+    @Basic
+    @Column(name = "ACTION")
+    public String action;
+
+
 }

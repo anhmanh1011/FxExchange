@@ -2,18 +2,26 @@ package com.api.orderfx.ApplicationListener;
 
 import com.api.orderfx.RestClientRequest.FXCMRequestClient;
 import com.api.orderfx.Utils.JsonUtils;
+import com.api.orderfx.Utils.ObjectMapperUtils;
+import com.api.orderfx.entity.OrderEntity;
+import com.api.orderfx.model.fxcm.response.OrderFxcmResponse;
+import com.api.orderfx.repository.OrderRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 import lombok.SneakyThrows;
 import okhttp3.OkHttpClient;
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -44,15 +52,30 @@ public class SocketConnectFXCM implements
     public static Socket server_socket;
     public static String bearer_access_token;
 
-    @Value("${fxcm.api.account.id}")
-    public static String accountId;
+    public static String ACCOUNT_ID;
+
+    @Autowired
+    OrderRepository orderRepository;
 
     @Autowired
     FXCMRequestClient fxcmRequestClient;
 
+    @Autowired
+    Environment properties;
+
+    @Autowired
+    ModelMapper modelMapper;
+
+    @Autowired
+    BeanUtilsBean beanUtilsBean;
+
     @SneakyThrows
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+
+        ACCOUNT_ID = properties.getProperty("fxcm.api.account.id");
+
+
         IO.Options options = new IO.Options();
         options.forceNew = true;
 
@@ -101,14 +124,40 @@ public class SocketConnectFXCM implements
         });
 
         server_socket.on("Offer", args -> log.info("Offer" + JsonUtils.ObjectToJson(args)));
-        server_socket.on("Order", args -> log.info("Order" + JsonUtils.ObjectToJson(args)));
-        server_socket.on("OpenPosition", args -> log.info("OpenPosition" + JsonUtils.ObjectToJson(args)));
-        server_socket.on("ClosedPosition", args -> log.info("ClosedPosition" + JsonUtils.ObjectToJson(args)));
-        server_socket.on("Order", args -> log.info("Order"+JsonUtils.ObjectToJson(args)));
-        server_socket.on("Account", args -> log.info("Account"+JsonUtils.ObjectToJson(args)));
-        server_socket.on("Summary", args -> log.info("Summary"+JsonUtils.ObjectToJson(args)));
-        server_socket.on("LeverageProfile", args -> log.info("LeverageProfile"+JsonUtils.ObjectToJson(args)));
-        server_socket.on("Properties", args -> log.info("Properties"+JsonUtils.ObjectToJson(args)));
+        server_socket.on("Order", new Emitter.Listener() {
+            @SneakyThrows
+            @Override
+            public void call(Object... objects) {
+                if (objects != null && objects.length > 0) {
+                    for (Object object : objects) {
+                        log.info("Order" + object);
+                        OrderFxcmResponse fxcmResponse = JsonUtils.JsonToObject((String) object, OrderFxcmResponse.class);
+//                        OrderFxcmResponse fxcmResponse = ObjectMapperUtils.convert(object, OrderFxcmResponse.class);
+//                        OrderFxcmResponse orderFxcmResponse = (OrderFxcmResponse) object;
+                        if (fxcmResponse.getAction().equals("I")) {
+                            OrderEntity orderEntity = modelMapper.map(fxcmResponse, OrderEntity.class);
+                            orderRepository.save(orderEntity);
+                        }
+                        if (fxcmResponse.getAction().equals("U")) {
+
+                            OrderEntity entity = orderRepository.getOrderEntityByOrderId(fxcmResponse.orderId);
+
+                            beanUtilsBean.copyProperties(entity, fxcmResponse);
+
+//                            OrderEntity properties = (OrderEntity) ObjectMapperUtils.copyNonNullProperties(fxcmResponse, entity);
+                            orderRepository.save(entity);
+                        }
+                    }
+                }
+            }
+        }).
+                on("OpenPosition", args -> log.info("OpenPosition" + JsonUtils.ObjectToJson(args))).
+                on("ClosedPosition", args -> log.info("ClosedPosition" + JsonUtils.ObjectToJson(args))).
+                on("Order", args -> log.info("Order" + JsonUtils.ObjectToJson(args))).
+                on("Account", args -> log.info("Account" + JsonUtils.ObjectToJson(args))).
+                on("Summary", args -> log.info("Summary" + JsonUtils.ObjectToJson(args))).
+                on("LeverageProfile", args -> log.info("LeverageProfile" + JsonUtils.ObjectToJson(args))).
+                on("Properties", args -> log.info("Properties" + JsonUtils.ObjectToJson(args)));
 
         server_socket.io().on(io.socket.engineio.client.Socket.EVENT_CLOSE, new Emitter.Listener() {
             @Override
@@ -247,6 +296,7 @@ public class SocketConnectFXCM implements
 
 
     void getDataAccount() throws Exception {
+
         LinkedHashMap linkedHashMap = fxcmRequestClient.sendGetRequest("/trading/get_model?models=Account");
         log.info(JsonUtils.ObjectToJson(linkedHashMap));
     }
@@ -261,4 +311,9 @@ public class SocketConnectFXCM implements
         linkedHashMap = fxcmRequestClient.sendPostRequest("/trading/subscribe", hashMap);
         log.info(JsonUtils.ObjectToJson(linkedHashMap));
     }
+
+    public String getACCOUNT_ID() {
+        return ACCOUNT_ID;
+    }
+
 }

@@ -11,6 +11,6 @@ public class CreateEntryOrderRequest {
     public Double limit;
     public Double rate;
     public Integer amount;
-    public String order_type;
-    public String time_in_force;
+    public String order_type = "Entry";
+    public String time_in_force = "GTC";
 }

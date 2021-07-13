@@ -1,11 +1,15 @@
 package com.api.orderfx.model.fxcm.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderFxcmResponse{
-    public Integer t;
-    public Integer ratePrecision;
+    public String t;
+    public String ratePrecision;
     public String orderId;
     public String tradeId;
     public String time;
@@ -16,27 +20,28 @@ public class OrderFxcmResponse{
     public String currency;
     public Boolean isBuy;
     public Double buy;
-    public Integer sell;
+    public String sell;
     public String type;
-    public Integer status;
-    public Integer amountK;
-    public Double currencyPoInteger;
-    public Integer stopMove;
-    public Integer stop;
-    public Integer stopRate;
-    public Integer limit;
-    public Integer limitRate;
+    public String status;
+    public String amountK;
+    public Double currencyPoString;
+    public Double stopMove;
+    public Double stop;
+    public Double stopRate;
+    public Double limit;
+    public Double limitRate;
     public Boolean isEntryOrder;
-    public Integer ocoBulkId;
+    public String ocoBulkId;
     public Boolean isNetQuantity;
     public Boolean isLimitOrder;
     public Boolean isStopOrder;
     public Boolean isELSOrder;
-    public Integer stopPegBaseType;
-    public Integer limitPegBaseType;
+    public Double stopPegBaseType;
+    public Double limitPegBaseType;
     public String child_trailingStop;
-    public Integer child_trailing;
+    public String child_trailing;
     public String trailingStop;
-    public Integer trailing;
-    public Integer range;
+    public String trailing;
+    public String range;
+    public String action;
 }

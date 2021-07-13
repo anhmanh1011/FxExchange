@@ -1,11 +1,13 @@
 package com.api.orderfx.service.fxcm;
 
+import com.api.orderfx.ApplicationListener.SocketConnectFXCM;
 import com.api.orderfx.RestClientRequest.FXCMRequestClient;
 import com.api.orderfx.Utils.JsonUtils;
 import com.api.orderfx.Utils.ObjectMapperUtils;
 import com.api.orderfx.common.FxcmUtils;
 import com.api.orderfx.entity.OrderEntity;
 import com.api.orderfx.model.fxcm.request.CreateEntryOrderRequest;
+import com.api.orderfx.model.fxcm.request.CreateOrderRequest;
 import com.api.orderfx.model.fxcm.response.DataCommonFxcm;
 import com.api.orderfx.model.fxcm.response.OrderFxcmResponse;
 import com.api.orderfx.model.fxcm.response.ResponseFxcmStatus;
@@ -61,28 +63,30 @@ public class FxcmApiImpl implements IFxcmApi {
     }
 
     @Override
-    public ResponseRootFxcm createOder(CreateEntryOrderRequest createEntryOrderRequest) {
+    public ResponseRootFxcm createOder(CreateOrderRequest createOrderRequest) {
         try {
-            LinkedHashMap linkedHashMap = fxcmRequestClient.sendPostRequest(FxcmUtils.CREATE_ORDER, createEntryOrderRequest);
 
+            CreateEntryOrderRequest createEntryOrderRequest = convertOrderRequestToEntryRequest(createOrderRequest);
+            createEntryOrderRequest.setAccount_id(SocketConnectFXCM.ACCOUNT_ID);
+            LinkedHashMap linkedHashMap = fxcmRequestClient.sendPostRequest(FxcmUtils.CREATE_ORDER, createEntryOrderRequest);
             ResponseRootFxcm rootFxcm = new ResponseRootFxcm();
             ResponseFxcmStatus responseFxcmStatus = ObjectMapperUtils.convert(linkedHashMap.get("response"), ResponseFxcmStatus.class);
             rootFxcm.setResponse(responseFxcmStatus);
             DataCommonFxcm data = ObjectMapperUtils.convert(linkedHashMap.get("data"), DataCommonFxcm.class);
             rootFxcm.setData(data);
-            if (responseFxcmStatus.getExecuted()) {
-                ResponseRootFxcm model = getModel(FxcmUtils.GET_ORDER_PARAM);
-                if (model.getResponse().getExecuted()) {
-                    List<OrderFxcmResponse> listOrder = (List<OrderFxcmResponse>) model.getData();
-                    log.info(JsonUtils.ObjectToJson(listOrder));
-
-
-                    OrderFxcmResponse order = listOrder.stream().filter(orderFxcmResponse -> orderFxcmResponse.getOrderId().equals(data.getOrderId())).findFirst().orElseThrow();
-                    log.info(JsonUtils.ObjectToJson(order));
-                    OrderEntity orderEntity = modelMapper.map(order, OrderEntity.class);
-                    orderRepository.save(orderEntity);
-                }
-            }
+//            if (responseFxcmStatus.getExecuted()) {
+//                ResponseRootFxcm model = getModel(FxcmUtils.GET_ORDER_PARAM);
+//                if (model.getResponse().getExecuted()) {
+//                    List<OrderFxcmResponse> listOrder = (List<OrderFxcmResponse>) model.getData();
+//                    log.info(JsonUtils.ObjectToJson(listOrder));
+//
+//
+//                    OrderFxcmResponse order = listOrder.stream().filter(orderFxcmResponse -> orderFxcmResponse.getOrderId().equals(data.getOrderId())).findFirst().orElseThrow();
+//                    log.info(JsonUtils.ObjectToJson(order));
+//                    OrderEntity orderEntity = modelMapper.map(order, OrderEntity.class);
+//                    orderRepository.save(orderEntity);
+//                }
+//            }
             return rootFxcm;
 
 
@@ -92,4 +96,17 @@ public class FxcmApiImpl implements IFxcmApi {
             throw exception;
         }
     }
+
+
+    private CreateEntryOrderRequest convertOrderRequestToEntryRequest(CreateOrderRequest createOrderRequest) {
+        CreateEntryOrderRequest createEntryOrderRequest = new CreateEntryOrderRequest();
+        createEntryOrderRequest.setSymbol(createOrderRequest.getSymbols());
+        createEntryOrderRequest.setIs_buy(createOrderRequest.getIsBuy());
+        createEntryOrderRequest.setRate(createOrderRequest.getPrice());
+        createEntryOrderRequest.setStop(createOrderRequest.getStop());
+        createEntryOrderRequest.setLimit(createOrderRequest.getLimit().stream().mapToDouble(value -> value).max().orElseThrow());
+        createEntryOrderRequest.setAmount(100);
+        return createEntryOrderRequest;
+    }
+
 }
