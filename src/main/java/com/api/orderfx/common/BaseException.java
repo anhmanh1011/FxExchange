@@ -1,7 +1,9 @@
 package com.api.orderfx.common;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class BaseException extends Exception {
 

@@ -2,12 +2,15 @@ package com.api.orderfx.config;
 
 import com.api.orderfx.RestClientRequest.FxcmHeaderRequestInterceptor;
 import com.api.orderfx.common.MyRestErrorHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -19,6 +22,13 @@ import java.util.Objects;
 @Configuration
 public class config implements WebMvcConfigurer {
 
+
+//    @Bean
+//    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
+//        ObjectMapper mapper = new ObjectMapper();
+//        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+//        return new MappingJackson2HttpMessageConverter(mapper);
+//    }
 
     @Bean
     public BeanUtilsBean beanUtilsBean(){

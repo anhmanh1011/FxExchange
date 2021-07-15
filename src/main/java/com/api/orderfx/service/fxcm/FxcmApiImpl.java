@@ -1,11 +1,19 @@
 package com.api.orderfx.service.fxcm;
 
-import com.api.orderfx.ApplicationListener.SocketConnectFXCM;
+import api.message.codes.TRADE_OPERATION_CODE;
+import api.message.codes.TRADE_TRANSACTION_TYPE;
+import api.message.command.APICommandFactory;
+import api.message.error.APICommandConstructionException;
+import api.message.error.APICommunicationException;
+import api.message.error.APIReplyParseException;
+import api.message.records.TradeTransInfoRecord;
+import api.message.response.APIErrorResponse;
+import api.message.response.TradeTransactionResponse;
+import com.api.orderfx.ApplicationListener.XTBSocketConnect;
 import com.api.orderfx.RestClientRequest.FXCMRequestClient;
 import com.api.orderfx.Utils.JsonUtils;
 import com.api.orderfx.Utils.ObjectMapperUtils;
 import com.api.orderfx.common.FxcmUtils;
-import com.api.orderfx.entity.OrderEntity;
 import com.api.orderfx.model.fxcm.request.CreateEntryOrderRequest;
 import com.api.orderfx.model.fxcm.request.CreateOrderRequest;
 import com.api.orderfx.model.fxcm.response.DataCommonFxcm;
@@ -21,6 +29,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -63,36 +73,31 @@ public class FxcmApiImpl implements IFxcmApi {
     }
 
     @Override
-    public ResponseRootFxcm createOder(CreateOrderRequest createOrderRequest) {
+    public TradeTransactionResponse createOder(CreateOrderRequest createOrderRequest) throws APIErrorResponse, APIReplyParseException, APICommunicationException, APICommandConstructionException {
         try {
+            Date dt = new Date();
+            Calendar c = Calendar.getInstance();
+            c.setTime(dt);
+            c.add(Calendar.DATE, 1);
+            dt = c.getTime();
 
-            CreateEntryOrderRequest createEntryOrderRequest = convertOrderRequestToEntryRequest(createOrderRequest);
-            createEntryOrderRequest.setAccount_id(SocketConnectFXCM.ACCOUNT_ID);
-            LinkedHashMap linkedHashMap = fxcmRequestClient.sendPostRequest(FxcmUtils.CREATE_ORDER, createEntryOrderRequest);
-            ResponseRootFxcm rootFxcm = new ResponseRootFxcm();
-            ResponseFxcmStatus responseFxcmStatus = ObjectMapperUtils.convert(linkedHashMap.get("response"), ResponseFxcmStatus.class);
-            rootFxcm.setResponse(responseFxcmStatus);
-            DataCommonFxcm data = ObjectMapperUtils.convert(linkedHashMap.get("data"), DataCommonFxcm.class);
-            rootFxcm.setData(data);
-//            if (responseFxcmStatus.getExecuted()) {
-//                ResponseRootFxcm model = getModel(FxcmUtils.GET_ORDER_PARAM);
-//                if (model.getResponse().getExecuted()) {
-//                    List<OrderFxcmResponse> listOrder = (List<OrderFxcmResponse>) model.getData();
-//                    log.info(JsonUtils.ObjectToJson(listOrder));
-//
-//
-//                    OrderFxcmResponse order = listOrder.stream().filter(orderFxcmResponse -> orderFxcmResponse.getOrderId().equals(data.getOrderId())).findFirst().orElseThrow();
-//                    log.info(JsonUtils.ObjectToJson(order));
-//                    OrderEntity orderEntity = modelMapper.map(order, OrderEntity.class);
-//                    orderRepository.save(orderEntity);
-//                }
-//            }
-            return rootFxcm;
+
+            TradeTransInfoRecord tradeTransInfoRecord = new TradeTransInfoRecord();
+            tradeTransInfoRecord.setCmd(TRADE_OPERATION_CODE.SELL_STOP);
+            tradeTransInfoRecord.setCustomComment("tradding with api");
+            tradeTransInfoRecord.setExpiration(dt.getTime());
+            tradeTransInfoRecord.setPrice(createOrderRequest.getPrice());
+            tradeTransInfoRecord.setSl(createOrderRequest.getStop());
+            tradeTransInfoRecord.setTp(createOrderRequest.getLimit().stream().mapToDouble(value -> value).max().orElseThrow());
+            tradeTransInfoRecord.setVolume(createOrderRequest.getAmount());
+            tradeTransInfoRecord.setSymbol(createOrderRequest.getSymbols());
+            tradeTransInfoRecord.setType(TRADE_TRANSACTION_TYPE.OPEN);
+            TradeTransactionResponse tradeTransactionResponse = APICommandFactory.executeTradeTransactionCommand(XTBSocketConnect.connector, tradeTransInfoRecord);
+            return tradeTransactionResponse;
 
 
         } catch (Exception exception) {
             exception.printStackTrace();
-            log.error(JsonUtils.ObjectToJson(exception));
             throw exception;
         }
     }
@@ -105,7 +110,18 @@ public class FxcmApiImpl implements IFxcmApi {
         createEntryOrderRequest.setRate(createOrderRequest.getPrice());
         createEntryOrderRequest.setStop(createOrderRequest.getStop());
         createEntryOrderRequest.setLimit(createOrderRequest.getLimit().stream().mapToDouble(value -> value).max().orElseThrow());
-        createEntryOrderRequest.setAmount(100);
+//        createEntryOrderRequest.setAmount(100);
+        return createEntryOrderRequest;
+    }
+
+    private CreateEntryOrderRequest convertTrade(CreateOrderRequest createOrderRequest) {
+        CreateEntryOrderRequest createEntryOrderRequest = new CreateEntryOrderRequest();
+        createEntryOrderRequest.setSymbol(createOrderRequest.getSymbols());
+        createEntryOrderRequest.setIs_buy(createOrderRequest.getIsBuy());
+        createEntryOrderRequest.setStop(createOrderRequest.getStop());
+        createEntryOrderRequest.setLimit(createOrderRequest.getLimit().stream().mapToDouble(value -> value).max().orElseThrow());
+        createEntryOrderRequest.setAmount(createOrderRequest.getAmount());
+        createEntryOrderRequest.setOrder_type("AtMarket");
         return createEntryOrderRequest;
     }
 

@@ -19,4 +19,6 @@ public class CreateOrderRequest {
 
     public Double price;
 
+    public Double amount;
+
 }

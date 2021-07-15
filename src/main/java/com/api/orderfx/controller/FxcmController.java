@@ -1,6 +1,5 @@
 package com.api.orderfx.controller;
 
-import com.api.orderfx.model.fxcm.request.CreateEntryOrderRequest;
 import com.api.orderfx.model.fxcm.request.CreateOrderRequest;
 import com.api.orderfx.service.fxcm.IFxcmApi;
 import org.springframework.beans.factory.annotation.Autowired;
