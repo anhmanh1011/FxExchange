@@ -6,7 +6,7 @@
 #ENTRYPOINT ["java","-jar","-Dspring.profiles.active=dev","app.jar"]
 
 
-FROM ascdc/jdk8
+FROM adoptopenjdk/openjdk11
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
 ENTRYPOINT ["java","-jar","-Dspring.profiles.active=dev","app.jar"]
