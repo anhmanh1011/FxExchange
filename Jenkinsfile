@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh('mvn clean install -DskipTests=false')
+                sh('mvn clean install -DskipTests=false -X')
             }
         }
         stage('add_Permission') {
