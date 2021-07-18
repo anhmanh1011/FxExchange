@@ -20,8 +20,8 @@ public class FxcmController {
         return ResponseEntity.ok(forObject);
     }
 
-    @PostMapping("/order")
-    public ResponseEntity getOrder(@RequestBody CreateOrderRequest createOrderRequest) throws Exception {
+    @PostMapping(value = "/order")
+    public ResponseEntity createOrder(@RequestBody CreateOrderRequest createOrderRequest) throws Exception {
 
         Object sendPostRequest = iFxcmApi.createOder(createOrderRequest);
         return ResponseEntity.ok(sendPostRequest);

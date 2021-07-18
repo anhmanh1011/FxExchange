@@ -30,9 +30,9 @@
             <AppenderRef ref="RollingFile" />
         </Root>
 
-        <Logger name="com.api.orderfx" level="debug">
-            <AppenderRef ref="RollingFile" level="error"/>
-            <AppenderRef ref="RollingFile" level="debug"/>
+        <Logger name="com.api.orderfx" level="trace" >
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
         </Logger>
     </Loggers>
 

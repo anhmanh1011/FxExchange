@@ -83,13 +83,17 @@ public class FxcmApiImpl implements IFxcmApi {
 
 
             TradeTransInfoRecord tradeTransInfoRecord = new TradeTransInfoRecord();
-            tradeTransInfoRecord.setCmd(TRADE_OPERATION_CODE.SELL_STOP);
+            tradeTransInfoRecord.setCmd(createOrderRequest.getIsBuy() ? TRADE_OPERATION_CODE.BUY_STOP : TRADE_OPERATION_CODE.SELL_STOP);
             tradeTransInfoRecord.setCustomComment("tradding with api");
             tradeTransInfoRecord.setExpiration(dt.getTime());
             tradeTransInfoRecord.setPrice(createOrderRequest.getPrice());
             tradeTransInfoRecord.setSl(createOrderRequest.getStop());
-            tradeTransInfoRecord.setTp(createOrderRequest.getLimit().stream().mapToDouble(value -> value).max().orElseThrow());
-            tradeTransInfoRecord.setVolume(createOrderRequest.getAmount());
+            if (createOrderRequest.getIsBuy()) {
+                tradeTransInfoRecord.setTp(createOrderRequest.getLimit().stream().mapToDouble(value -> value).max().orElseThrow());
+            } else {
+                tradeTransInfoRecord.setTp(createOrderRequest.getLimit().stream().mapToDouble(value -> value).min().orElseThrow());
+            }
+            tradeTransInfoRecord.setVolume(0.01);
             tradeTransInfoRecord.setSymbol(createOrderRequest.getSymbols());
             tradeTransInfoRecord.setType(TRADE_TRANSACTION_TYPE.OPEN);
             TradeTransactionResponse tradeTransactionResponse = APICommandFactory.executeTradeTransactionCommand(XTBSocketConnect.connector, tradeTransInfoRecord);
