@@ -132,6 +132,7 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <mainClass>com.api.orderfx.OrderFxApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
