@@ -41,7 +41,7 @@ import api.message.response.VersionResponse;
 import api.sync.Credentials;
 import api.sync.Server;
 import api.sync.SyncAPIConnector;
-import org.json.JSONArray;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
@@ -268,7 +268,7 @@ public class APICommandFactory {
     public static TradeRecordsCommand createTradeRecordsCommand(List<Long> orders) throws APICommandConstructionException {
         JSONObject args = new JSONObject();
         JSONArray arr = new JSONArray();
-        arr.put(orders);
+        arr.addAll(orders);
         args.put("orders", arr);
         return new TradeRecordsCommand(args);
     }
@@ -313,10 +313,11 @@ public class APICommandFactory {
     public static TradingHoursCommand createTradingHoursCommand(List<String> symbols) throws APICommandConstructionException {
         JSONObject args = new JSONObject();
         JSONArray arr = new JSONArray();
-        arr.put(symbols);
+        arr.addAll(symbols);
         args.put("symbols", arr);
         return new TradingHoursCommand(args);
     }
+
 
     public static ChartResponse executeChartLastCommand(SyncAPIConnector connector, String symbol, PERIOD_CODE period, Long start) throws APICommandConstructionException, APICommunicationException, APIReplyParseException, APIErrorResponse {
         return new ChartResponse(connector.safeExecuteCommand(createChartLastCommand(symbol, period, start)));

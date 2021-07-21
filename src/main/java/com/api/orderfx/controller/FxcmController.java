@@ -1,30 +1,28 @@
 package com.api.orderfx.controller;
 
 import com.api.orderfx.model.fxcm.request.CreateOrderRequest;
-import com.api.orderfx.service.fxcm.IFxcmApi;
+import com.api.orderfx.service.fxcm.ITradeApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/fxcm")
+@RequestMapping("/trade")
 public class FxcmController {
 
     @Autowired
-    IFxcmApi iFxcmApi;
+    ITradeApi tradeApi;
 
-    @GetMapping("/model")
-    public ResponseEntity getModel(@RequestParam(name = "type") String type) throws Exception {
+//    @GetMapping("/model")
+//    public ResponseEntity getModel(@RequestParam(name = "type") String type) throws Exception {
+//
+//        Object forObject = tradeApi.getModel(type);
+//        return ResponseEntity.ok(forObject);
+//    }
 
-        Object forObject = iFxcmApi.getModel(type);
-        return ResponseEntity.ok(forObject);
-    }
-
-    @PostMapping(value = "/order")
+    @PostMapping(value = "/open")
     public ResponseEntity createOrder(@RequestBody CreateOrderRequest createOrderRequest) throws Exception {
-
-        Object sendPostRequest = iFxcmApi.createOder(createOrderRequest);
-        return ResponseEntity.ok(sendPostRequest);
+        return ResponseEntity.ok(tradeApi.openTrade(createOrderRequest));
     }
 
 

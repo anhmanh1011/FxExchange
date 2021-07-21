@@ -21,4 +21,6 @@ public class CreateOrderRequest {
 
     public Double amount;
 
+    public Double offset;
+
 }

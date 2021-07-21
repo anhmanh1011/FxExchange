@@ -18,18 +18,15 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> customHandleException(
             Exception ex, WebRequest request) {
-
-        BaseResponse baseResponse = new BaseResponse();
-        baseResponse.setMessage(ex.getMessage());
         log.error("ex: " + JsonUtils.ObjectToJson(ex));
-        return new ResponseEntity<>(baseResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new BaseResponse(HttpStatus.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(BaseException.class)
     public ResponseEntity customHandleBaseException(
             BaseException ex, WebRequest request) {
         BaseResponse baseResponse = new BaseResponse();
-        baseResponse.setErrorCode(String.valueOf(ex.getCode()));
+        baseResponse.setCode(ex.getCode());
         baseResponse.setMessage(ex.getMessage());
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
 

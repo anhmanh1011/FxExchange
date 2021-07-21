@@ -70,7 +70,7 @@ public class XTBSocketConnect implements
 
                     @Override
                     public void receiveKeepAliveRecord(SKeepAliveRecord keepAliveRecord) {
-                        log.debug("Stream tick KeepAliveRecord: " + JsonUtils.ObjectToJson(keepAliveRecord));
+//                        log.debug("Stream tick KeepAliveRecord: " + JsonUtils.ObjectToJson(keepAliveRecord));
                     }
 
                     @Override
