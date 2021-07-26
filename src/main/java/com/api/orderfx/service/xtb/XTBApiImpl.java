@@ -13,7 +13,6 @@ import api.message.response.SymbolResponse;
 import api.message.response.TradeRecordsResponse;
 import api.message.response.TradeTransactionResponse;
 import api.sync.SyncAPIConnector;
-import com.api.orderfx.RestClientRequest.FXCMRequestClient;
 import com.api.orderfx.Utils.ConverterUtils;
 import com.api.orderfx.Utils.JsonUtils;
 import com.api.orderfx.common.BaseException;
@@ -37,9 +36,6 @@ import java.util.Date;
 @Service
 @Slf4j
 public class XTBApiImpl implements ITradeApi {
-
-    @Autowired
-    FXCMRequestClient fxcmRequestClient;
 
     @Autowired
     ObjectMapper objectMapper;

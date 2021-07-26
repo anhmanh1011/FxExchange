@@ -57,7 +57,7 @@ pipeline {
 
                 }
 
-                sh('docker run  --name order_fx -d -p 8090:8090 order_fx')
+                sh(script: 'docker run  --name order_fx -d -p 8090:8090 order_fx', returnStdout: true)
             }
         }
 
