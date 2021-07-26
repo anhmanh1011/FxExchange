@@ -1,7 +1,7 @@
 package com.api.orderfx.controller;
 
 import com.api.orderfx.model.fxcm.request.CreateOrderRequest;
-import com.api.orderfx.service.fxcm.ITradeApi;
+import com.api.orderfx.service.xtb.ITradeApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

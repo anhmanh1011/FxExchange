@@ -23,13 +23,6 @@ import java.util.Objects;
 public class config implements WebMvcConfigurer {
 
 
-//    @Bean
-//    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-//        ObjectMapper mapper = new ObjectMapper();
-//        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-//        return new MappingJackson2HttpMessageConverter(mapper);
-//    }
-
     @Bean
     public BeanUtilsBean beanUtilsBean(){
         return new NullAwareBeanUtilsBean();
@@ -45,16 +38,16 @@ public class config implements WebMvcConfigurer {
     @Autowired
     private Environment env;
 
-    @Bean("RestForFXCM")
-    public RestTemplate restForFXCM() {
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setInterceptors(Collections.singletonList(new FxcmHeaderRequestInterceptor()));
-        String uriConnection = env.getProperty("fxcm.uri.connection");
-        DefaultUriBuilderFactory defaultUriBuilderFactory = new DefaultUriBuilderFactory(Objects.requireNonNull(uriConnection));
-        restTemplate.setUriTemplateHandler(defaultUriBuilderFactory);
-        restTemplate.setErrorHandler(new MyRestErrorHandler());
-        return restTemplate;
-    }
+//    @Bean("RestForFXCM")
+//    public RestTemplate restForFXCM() {
+//        RestTemplate restTemplate = new RestTemplate();
+//        restTemplate.setInterceptors(Collections.singletonList(new FxcmHeaderRequestInterceptor()));
+//        String uriConnection = env.getProperty("fxcm.uri.connection");
+//        DefaultUriBuilderFactory defaultUriBuilderFactory = new DefaultUriBuilderFactory(Objects.requireNonNull(uriConnection));
+//        restTemplate.setUriTemplateHandler(defaultUriBuilderFactory);
+//        restTemplate.setErrorHandler(new MyRestErrorHandler());
+//        return restTemplate;
+//    }
 
 
     @Bean

@@ -1,4 +1,4 @@
-package com.api.orderfx.service.fxcm;
+package com.api.orderfx.service.xtb;
 
 import api.message.codes.TRADE_OPERATION_CODE;
 import api.message.codes.TRADE_TRANSACTION_TYPE;
@@ -8,14 +8,20 @@ import api.message.error.APICommunicationException;
 import api.message.error.APIReplyParseException;
 import api.message.records.TradeRecord;
 import api.message.records.TradeTransInfoRecord;
-import api.message.response.*;
-import com.api.orderfx.ApplicationListener.XTBSocketConnect;
+import api.message.response.APIErrorResponse;
+import api.message.response.SymbolResponse;
+import api.message.response.TradeRecordsResponse;
+import api.message.response.TradeTransactionResponse;
+import api.sync.SyncAPIConnector;
 import com.api.orderfx.RestClientRequest.FXCMRequestClient;
 import com.api.orderfx.Utils.ConverterUtils;
+import com.api.orderfx.Utils.JsonUtils;
+import com.api.orderfx.common.BaseException;
+import com.api.orderfx.common.ConnectorFactory;
 import com.api.orderfx.common.ResponseUtils;
 import com.api.orderfx.entity.TradeTransInfoEntity;
-import com.api.orderfx.model.fxcm.request.CreateOrderRequest;
 import com.api.orderfx.model.common.BaseResponse;
+import com.api.orderfx.model.fxcm.request.CreateOrderRequest;
 import com.api.orderfx.repository.OrderRepository;
 import com.api.orderfx.repository.TradeTransInfoRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,11 +30,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
 
 @Service
 @Slf4j
-public class FxcmApiImpl implements ITradeApi {
+public class XTBApiImpl implements ITradeApi {
 
     @Autowired
     FXCMRequestClient fxcmRequestClient;
@@ -45,10 +53,14 @@ public class FxcmApiImpl implements ITradeApi {
     @Autowired
     TradeTransInfoRepository tradeTransInfoRepository;
 
+    @Autowired
+    ConnectorFactory connectorFactory;
 
     @Override
-    public BaseResponse openTrade(CreateOrderRequest createOrderRequest) throws APIErrorResponse, APIReplyParseException, APICommunicationException, APICommandConstructionException {
+    public BaseResponse openTrade(CreateOrderRequest createOrderRequest) throws APIErrorResponse, APIReplyParseException, APICommunicationException, APICommandConstructionException, BaseException {
         try {
+
+            SyncAPIConnector connector = connectorFactory.getConnector();
             Date dt = new Date();
             Calendar c = Calendar.getInstance();
             c.setTime(dt);
@@ -73,10 +85,12 @@ public class FxcmApiImpl implements ITradeApi {
             tradeTransInfoRecord.setVolume(0.01);
             tradeTransInfoRecord.setSymbol(createOrderRequest.getSymbols());
             tradeTransInfoRecord.setType(TRADE_TRANSACTION_TYPE.OPEN);
-            TradeTransactionResponse tradeTransactionResponse = APICommandFactory.executeTradeTransactionCommand(XTBSocketConnect.connector, tradeTransInfoRecord);
+            TradeTransactionResponse tradeTransactionResponse = APICommandFactory.executeTradeTransactionCommand(connector, tradeTransInfoRecord);
+            log.info("open trade : " + JsonUtils.ObjectToJson(tradeTransactionResponse));
+
             if (tradeTransactionResponse.getStatus()) {
                 Long order = tradeTransactionResponse.getOrder();
-                TradeRecordsResponse tradeRecordsResponse = APICommandFactory.executeTradeRecordsCommand(XTBSocketConnect.connector, Collections.singletonList(order));
+                TradeRecordsResponse tradeRecordsResponse = APICommandFactory.executeTradeRecordsCommand(connector, Collections.singletonList(order));
                 TradeRecord tradeRecord = tradeRecordsResponse.getTradeRecords().get(0);
                 TradeTransInfoEntity tradeTransInfoEntity = ConverterUtils.tradeRecordInfoToTradeTransInfoEntity(tradeRecord);
                 tradeTransInfoRepository.save(tradeTransInfoEntity);
@@ -90,8 +104,9 @@ public class FxcmApiImpl implements ITradeApi {
     }
 
     @Override
-    public SymbolResponse getSymbol(String symbol) throws APIErrorResponse, APIReplyParseException, APICommunicationException, APICommandConstructionException {
-        return APICommandFactory.executeSymbolCommand(XTBSocketConnect.connector, symbol);
+    public SymbolResponse getSymbol(String symbol) throws APIErrorResponse, APIReplyParseException, APICommunicationException, APICommandConstructionException, BaseException {
+        SyncAPIConnector connector = connectorFactory.getConnector();
+        return APICommandFactory.executeSymbolCommand(connector, symbol);
     }
 
 
