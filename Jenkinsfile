@@ -27,7 +27,7 @@ pipeline {
         }
         stage('build_docker') {
             steps {
-                sh('docker build -t oderFx .')
+                sh('docker build -t order_fx .')
             }
         }
 
@@ -37,15 +37,15 @@ pipeline {
                 script {
 
                     try {
-                        String imageExists = sh(script: 'docker ps --filter "name=oderFx"', returnStdout: true)
+                        String imageExists = sh(script: 'docker ps --filter "name=order_fx"', returnStdout: true)
                         echo imageExists;
-                        if (imageExists != null && imageExists.contains('oderFx')) {
+                        if (imageExists != null && imageExists.contains('order_fx')) {
                             echo 'Ton tai container old version';
 //                            String isStop = sh(script: 'docker stop demo_jenkins"', returnStdout: true)
 //                            if (isStop != null && isStop != '') {
 //                                echo 'stop successfully';
 //                            }
-                            String isRemoveContainerOldVersion = sh(script: 'docker rm --force $(docker ps --filter name=oderFx -q)', returnStdout: true)
+                            String isRemoveContainerOldVersion = sh(script: 'docker rm --force $(docker ps --filter name=order_fx -q)', returnStdout: true)
                             if (isRemoveContainerOldVersion != null && isRemoveContainerOldVersion != '') {
                                 echo 'remove successfully'
                             }
@@ -57,7 +57,7 @@ pipeline {
 
                 }
 
-                sh('docker run  --name oderFx -d -p 8090:8090 oderFx')
+                sh('docker run  --name order_fx -d -p 8090:8090 order_fx')
             }
         }
 
