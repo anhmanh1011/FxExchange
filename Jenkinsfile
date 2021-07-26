@@ -27,7 +27,7 @@ pipeline {
         }
         stage('build_docker') {
             steps {
-                sh('docker build -t OderFx .')
+                sh('docker build -t oderFx .')
             }
         }
 
