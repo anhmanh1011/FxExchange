@@ -37,7 +37,7 @@ pipeline {
                 script {
 
                     try {
-                        String imageExists = sh(script: 'docker ps --filter "name=order_fx"', returnStdout: true)
+                        String imageExists = sh(script: 'docker ps -a --filter "name=order_fx"', returnStdout: true)
                         echo imageExists;
                         if (imageExists != null && imageExists.contains('order_fx')) {
                             echo 'Ton tai container old version';
