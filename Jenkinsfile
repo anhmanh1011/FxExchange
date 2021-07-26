@@ -45,7 +45,7 @@ pipeline {
 //                            if (isStop != null && isStop != '') {
 //                                echo 'stop successfully';
 //                            }
-                            String isRemoveContainerOldVersion = sh(script: 'docker rm --force $(docker ps --filter name=order_fx -q)', returnStdout: true)
+                            String isRemoveContainerOldVersion = sh(script: 'docker rm --force $(docker ps -a --filter name=order_fx -q)', returnStdout: true)
                             if (isRemoveContainerOldVersion != null && isRemoveContainerOldVersion != '') {
                                 echo 'remove successfully'
                             }
