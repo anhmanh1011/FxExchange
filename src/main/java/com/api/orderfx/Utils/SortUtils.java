@@ -13,6 +13,6 @@ public class SortUtils {
       return o1.compareTo(o2);
     }
     public static int reduceCompare(Double o1, Double o2) {
-      return o1.compareTo(o2);
+      return o2.compareTo(o1);
     }
 }
