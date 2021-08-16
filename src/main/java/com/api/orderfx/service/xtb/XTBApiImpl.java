@@ -59,102 +59,113 @@ public class XTBApiImpl implements ITradeApi {
     @Override
     @Transactional
     public BaseResponse openPosition(CreateOrderRequest createOrderRequest) throws APIErrorResponse, APIReplyParseException, APICommunicationException, APICommandConstructionException, BaseException {
-
-        PositionInfoEntity entity = positionInfoRepository.findPositionInfoEntityByChannelIdAndPriceAndClosedIsFalse(createOrderRequest.getChannelId(), createOrderRequest.getPrice());
-        if (entity != null && !entity.getClosed()) {
-            log.info("ORDER đã tồn tại");
-            throw new BaseException(EnumCodeResponse.ORDER_REJECTED);
-        }
-
-        SymbolsSubscribeEntity symbolsSubscribeEntity = symbolsSubscribeRepository.getByChannelIdAndSymbol(createOrderRequest.getChannelId(), createOrderRequest.getSymbols());
-
-        String symbolBroker;
-        String symbolSub;
-        if (symbolsSubscribeEntity != null) {
-            symbolBroker = symbolsSubscribeEntity.getSymbolBroker();
-            symbolSub = symbolsSubscribeEntity.getSymbolSubscribe();
-        } else {
-            symbolBroker = symbolSub = createOrderRequest.getSymbols();
-        }
-
         SyncAPIConnector connector = connectorFactory.getConnector();
-        Long longTimeCurrent = TimeUtils.getLongTime(1);
-        TradeTransInfoRecord tradeTransInfoRecord = new TradeTransInfoRecord();
-        tradeTransInfoRecord.setCmd(createOrderRequest.getIsBuy() ? TRADE_OPERATION_CODE.BUY : TRADE_OPERATION_CODE.SELL);
-        tradeTransInfoRecord.setCustomComment("tradding with api");
-        tradeTransInfoRecord.setExpiration(longTimeCurrent);
-        tradeTransInfoRecord.setSl(createOrderRequest.getStop());
-        SymbolResponse symbol = getSymbol(symbolBroker);
-        log.info(symbol.toString());
 
-        ETransactionType eTransactionType;
-        if (createOrderRequest.getIsBuy()) {
-            tradeTransInfoRecord.setTp(createOrderRequest.getLimit().stream().mapToDouble(value -> value).max().orElseThrow());
-            tradeTransInfoRecord.setPrice(symbol.getSymbol().getAsk());
-            eTransactionType = ETransactionType.POSITION_BUY;
-            createOrderRequest.getLimit().add(createOrderRequest.getPrice());
-            createOrderRequest.getLimit().sort(SortUtils::augmentCompare);
-        } else {
-            createOrderRequest.getLimit().sort(SortUtils::reduceCompare);
-            tradeTransInfoRecord.setPrice(symbol.getSymbol().getBid());
-            tradeTransInfoRecord.setTp(createOrderRequest.getLimit().stream().mapToDouble(value -> value).min().orElseThrow());
-            eTransactionType = ETransactionType.POSITION_SELL;
-            createOrderRequest.getLimit().add(createOrderRequest.getPrice());
-            createOrderRequest.getLimit().sort(SortUtils::reduceCompare);
+        try {
 
-        }
-        tradeTransInfoRecord.setVolume(0.01);
-
-        tradeTransInfoRecord.setSymbol(symbolBroker);
-
-        tradeTransInfoRecord.setType(TRADE_TRANSACTION_TYPE.OPEN);
-        TradeTransactionResponse tradeTransactionResponse = APICommandFactory.executeTradeTransactionCommand(connector, tradeTransInfoRecord);
-        log.info("open trade : " + JsonUtils.ObjectToJson(tradeTransactionResponse));
-        if (tradeTransactionResponse.getStatus()) {
-
-            Long order = tradeTransactionResponse.getOrder();
-
-            PositionInfoEntity positionInfoEntity = new PositionInfoEntity();
-            positionInfoEntity.setOrderId(order);
-            positionInfoEntity.setType(eTransactionType);
-            positionInfoEntity.setPrice(createOrderRequest.getPrice());
-            positionInfoEntity.setBrokerName(BrokerCode.XTB_EXCHANGE);
-            positionInfoEntity.setStatus(EStatusTrade.POSITION_PENDING);
-            positionInfoEntity.setChannelId(createOrderRequest.getChannelId());
-            positionInfoRepository.save(positionInfoEntity);
-            try {
-                MetaApiSocketConnect.connection.subscribeToMarketData(symbolSub);
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                log.error(JsonUtils.ObjectToJson(ex));
+            PositionInfoEntity entity = positionInfoRepository.findPositionInfoEntityByChannelIdAndPriceAndClosedIsFalse(createOrderRequest.getChannelId(), createOrderRequest.getPrice());
+            if (entity != null && !entity.getClosed()) {
+                log.info("ORDER đã tồn tại");
+                throw new BaseException(EnumCodeResponse.ORDER_REJECTED);
             }
 
-            // insert profit management
-            ProfitManagementInfoEntity profitManagementInfo = new ProfitManagementInfoEntity();
-            StringBuilder lstProfit = new StringBuilder();
-            for (Double aDouble : createOrderRequest.getLimit()) {
-                lstProfit.append(aDouble).append(";");
+            SymbolsSubscribeEntity symbolsSubscribeEntity = symbolsSubscribeRepository.getByChannelIdAndSymbol(createOrderRequest.getChannelId(), createOrderRequest.getSymbols());
+
+            String symbolBroker;
+            String symbolSub;
+            if (symbolsSubscribeEntity != null) {
+                symbolBroker = symbolsSubscribeEntity.getSymbolBroker();
+                symbolSub = symbolsSubscribeEntity.getSymbolSubscribe();
+            } else {
+                symbolBroker = symbolSub = createOrderRequest.getSymbols();
             }
-            profitManagementInfo.setLstProfit(lstProfit.toString());
-            profitManagementInfo.setBrokerName(BrokerCode.XTB_EXCHANGE);
-            profitManagementInfo.setIsBuy(createOrderRequest.getIsBuy());
-            profitManagementInfo.setSymbols(createOrderRequest.getSymbols());
-            profitManagementInfo.setOrderId(positionInfoEntity.getOrderId());
-            profitManagementInfo.setStatus(EStatusTrade.POSITION_PENDING);
-            profitManagementRepository.save(profitManagementInfo);
-            return ResponseUtils.created();
+
+            Long longTimeCurrent = TimeUtils.getLongTime(1);
+            TradeTransInfoRecord tradeTransInfoRecord = new TradeTransInfoRecord();
+            tradeTransInfoRecord.setCmd(createOrderRequest.getIsBuy() ? TRADE_OPERATION_CODE.BUY : TRADE_OPERATION_CODE.SELL);
+            tradeTransInfoRecord.setCustomComment("tradding with api");
+            tradeTransInfoRecord.setExpiration(longTimeCurrent);
+            tradeTransInfoRecord.setSl(createOrderRequest.getStop());
+            SymbolResponse symbol = getSymbol(symbolBroker);
+            log.info(symbol.toString());
+
+            ETransactionType eTransactionType;
+            if (createOrderRequest.getIsBuy()) {
+                tradeTransInfoRecord.setTp(createOrderRequest.getLimit().stream().mapToDouble(value -> value).max().orElseThrow());
+                tradeTransInfoRecord.setPrice(symbol.getSymbol().getAsk());
+                eTransactionType = ETransactionType.POSITION_BUY;
+                createOrderRequest.getLimit().add(createOrderRequest.getPrice());
+                createOrderRequest.getLimit().sort(SortUtils::augmentCompare);
+            } else {
+                createOrderRequest.getLimit().sort(SortUtils::reduceCompare);
+                tradeTransInfoRecord.setPrice(symbol.getSymbol().getBid());
+                tradeTransInfoRecord.setTp(createOrderRequest.getLimit().stream().mapToDouble(value -> value).min().orElseThrow());
+                eTransactionType = ETransactionType.POSITION_SELL;
+                createOrderRequest.getLimit().add(createOrderRequest.getPrice());
+                createOrderRequest.getLimit().sort(SortUtils::reduceCompare);
+
+            }
+            tradeTransInfoRecord.setVolume(0.01);
+
+            tradeTransInfoRecord.setSymbol(symbolBroker);
+
+            tradeTransInfoRecord.setType(TRADE_TRANSACTION_TYPE.OPEN);
+            TradeTransactionResponse tradeTransactionResponse = APICommandFactory.executeTradeTransactionCommand(connector, tradeTransInfoRecord);
+            log.info("open trade : " + JsonUtils.ObjectToJson(tradeTransactionResponse));
+            if (tradeTransactionResponse.getStatus()) {
+
+                Long order = tradeTransactionResponse.getOrder();
+
+                PositionInfoEntity positionInfoEntity = new PositionInfoEntity();
+                positionInfoEntity.setOrderId(order);
+                positionInfoEntity.setType(eTransactionType);
+                positionInfoEntity.setPrice(createOrderRequest.getPrice());
+                positionInfoEntity.setBrokerName(BrokerCode.XTB_EXCHANGE);
+                positionInfoEntity.setStatus(EStatusTrade.POSITION_PENDING);
+                positionInfoEntity.setChannelId(createOrderRequest.getChannelId());
+                positionInfoRepository.save(positionInfoEntity);
+                try {
+                    MetaApiSocketConnect.connection.subscribeToMarketData(symbolSub);
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    log.error(JsonUtils.ObjectToJson(ex));
+                }
+
+                // insert profit management
+                ProfitManagementInfoEntity profitManagementInfo = new ProfitManagementInfoEntity();
+                StringBuilder lstProfit = new StringBuilder();
+                for (Double aDouble : createOrderRequest.getLimit()) {
+                    lstProfit.append(aDouble).append(";");
+                }
+                profitManagementInfo.setLstProfit(lstProfit.toString());
+                profitManagementInfo.setBrokerName(BrokerCode.XTB_EXCHANGE);
+                profitManagementInfo.setIsBuy(createOrderRequest.getIsBuy());
+                profitManagementInfo.setSymbols(createOrderRequest.getSymbols());
+                profitManagementInfo.setOrderId(positionInfoEntity.getOrderId());
+                profitManagementInfo.setStatus(EStatusTrade.POSITION_PENDING);
+                profitManagementRepository.save(profitManagementInfo);
+                return ResponseUtils.created();
+            }
+        } catch (Exception ex) {
+            log.error(JsonUtils.ObjectToJson(ex));
+            throw new BaseException(EnumCodeResponse.INTERNAL_SERVER);
+
+        } finally {
+            connector.close();
         }
+
         throw new BaseException(EnumCodeResponse.ORDER_REJECTED);
 
     }
 
     @Override
     public BaseResponse modifyPosition(ModifyOrderRequest modifyOrderRequest) throws APIErrorResponse, APIReplyParseException, APICommunicationException, APICommandConstructionException, BaseException {
+        SyncAPIConnector connector = connectorFactory.getConnector();
+
         try {
             TradeTransInfoRecord tradeTransInfoRecord = new TradeTransInfoRecord();
             PositionInfoEntity entity;
-            SyncAPIConnector connector = connectorFactory.getConnector();
 
             if (modifyOrderRequest.getPositionId() != null) {
 //                obj.put("customComment", "Modify by job");
@@ -210,6 +221,8 @@ public class XTBApiImpl implements ITradeApi {
             ex.printStackTrace();
             log.error(JsonUtils.ObjectToJson(ex));
             throw new BaseException(EnumCodeResponse.INTERNAL_SERVER);
+        } finally {
+            connector.close();
         }
         throw new BaseException(EnumCodeResponse.ORDER_REJECTED);
     }
