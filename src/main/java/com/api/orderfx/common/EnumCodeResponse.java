@@ -3,7 +3,9 @@ package com.api.orderfx.common;
 public enum EnumCodeResponse {
 
     SUCCESS(0, "Thành Công"),
-    ORDER_REJECTED(1, "ORDER_REJECTED");
+    INTERNAL_SERVER(500, "INTERNAL_SERVER"),
+    ORDER_REJECTED(2, "ORDER_REJECTED"),
+    ORDER_NOT_FOUND(3, "ORDER_NOT_FOUND");
 
     private final int code;
     private final String description;

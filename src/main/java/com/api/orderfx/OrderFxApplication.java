@@ -1,12 +1,7 @@
 package com.api.orderfx;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @SpringBootApplication
 public class OrderFxApplication {
@@ -15,48 +10,133 @@ public class OrderFxApplication {
         SpringApplication.run(OrderFxApplication.class, args);
     }
 
-//    public static void main(String[] args) {
-//        String input1 = "XAUUSD Buy 1798\n" +
-//                "TP 1804\n" +
-//                "TP 1807\n" +
-//                "TP 1812\n" +
-//                "SL 1790\n";
+//    private static String symbol = getEnvOrDefault("SYMBOL", "EURUSD");
+//    private static String token = getEnvOrDefault("TOKEN", "gHevelEGc2mk4As6FzSvBp4aiPPEtEcHQzoJlunpqPi0blK26B5sHUaTun3ToTQZ");
+//    private static String accountId = getEnvOrDefault("ACCOUNT_ID", "ac738a46-c3c8-4c43-a65b-d34f66f2d3ba");
 //
-//        String input2 = "GBPJY BUY\n" +
-//                "153.000\n" +
-//                "Tp1 153.250\n" +
-//                "Tp2 153.500\n" +
-//                "SL@152.400";
+//    public static void main2(String[] args) {
+//        long start = new Date().getTime();
 //
-//
-//        String input3 = "GBPNZD BUY  1.98000\n" +
-//                "\n" +
-//                "Tp1.    1.98400\n" +
-//                "Tp2.    1.99000\n" +
-//                "Sl       1.97500";
-//
-//        String input4 = "EURGBP SELL 0.86000\n" +
-//                "\n" +
-//                "Tp1.   0.85700\n" +
-//                "Tp2.   0.85400\n" +
-//                "Sl.      0.86400";
-//
-//        List<String> listInput = new ArrayList<>();
-//        listInput.add(input1);
-//        listInput.add(input2);
-//        listInput.add(input3);
-//        listInput.add(input4);
-//
-//        listInput.forEach(System.out::println);
-//
-//        List<String> collect = listInput.stream().map(s -> s.replaceAll("[^a-zA-Z0-9.]", " ").toUpperCase().replaceAll("\n", " ").replaceAll("\r", " ").replaceAll(" +", " ").trim()).collect(Collectors.toList());
-//
-//        System.out.println("=====================");
-//        collect.forEach(System.out::println);
-//
-////        collect.stream().map(s -> s.split())
+//        try {
+//            MetaApi api = new MetaApi(token);
+//            // Add test MetaTrader account
+//            MetatraderAccount account = api.getMetatraderAccountApi().getAccount(accountId).get();
 //
 //
+//            System.out.println("Waiting for API server to connect to broker (may take couple of minutes)");
+//            account.waitConnected().get();
+//
+//            // connect to MetaApi API
+//            MetaApiConnection connection = account.connect().get();
+//
+//            SynchronizationListener quoteListener = new QuoteListener();
+//            connection.addSynchronizationListener(quoteListener);
+//
+//            System.out.println("Waiting for SDK to synchronize to terminal state "
+//                    + "(may take some time depending on your history size)");
+//            connection.waitSynchronized().get();
+//            // trade
+//            System.out.println("Submitting pending order");
+//            try {
+//                MetatraderTradeResponse result = connection
+//                        .createLimitBuyOrder("GBPUSD", 0.07, 1.0, 0.9, 2.0, new PendingTradeOptions() {{
+//                            comment = "comm";
+//                            clientId = "TE_GBPUSD_7hyINWqAlE";
+//                        }}).get();
+//                System.out.println("Trade successful, result code is " + result.stringCode);
+//            } catch (ExecutionException err) {
+//                System.out.println("Trade failed with result code " + ((TradeException) err.getCause()).stringCode);
+//            }
+//
+//
+//            while (true)
+//                Thread.sleep(1000);
+//
+//
+//        } catch (Exception err) {
+//            System.err.println(err);
+//        }
+//
+//        System.exit(0);
+//    }
+//
+//    private static String getEnvOrDefault(String name, String defaultValue) {
+//        String result = System.getenv(name);
+//        return (result != null ? result : defaultValue);
+//    }
+//
+//    private static class QuoteListener extends SynchronizationListener {
+//
+//        @Override
+//        public CompletableFuture<Void> onAccountInformationUpdated(String instanceIndex, MetatraderAccountInformation accountInformation) {
+//            try {
+//                System.out.println("  accountInformation " + asJson(accountInformation));
+//            } catch (JsonProcessingException e) {
+//                e.printStackTrace();
+//            }
+//            return CompletableFuture.completedFuture(null);
+//        }
+//
+//        @Override
+//        public CompletableFuture<Void> onSymbolPriceUpdated(String instanceIndex, MetatraderSymbolPrice price) {
+//            try {
+//                System.out.println(price.symbol + " price updated " + asJson(price));
+//            } catch (JsonProcessingException e) {
+//                e.printStackTrace();
+//            }
+//            return CompletableFuture.completedFuture(null);
+//        }
+//
+//        @Override
+//        public CompletableFuture<Void> onCandlesUpdated(String instanceIndex, List<MetatraderCandle> candles,
+//                                                        Double equity, Double margin, Double freeMargin, Double marginLevel, Double accountCurrencyExchangeRate) {
+//            for (MetatraderCandle candle : candles) {
+//                try {
+//                    System.out.println(" candle updated " + asJson(candle));
+//                } catch (JsonProcessingException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            return CompletableFuture.completedFuture(null);
+//        }
+//
+//        @Override
+//        public CompletableFuture<Void> onTicksUpdated(String instanceIndex, List<MetatraderTick> ticks,
+//                                                      Double equity, Double margin, Double freeMargin, Double marginLevel, Double accountCurrencyExchangeRate) {
+//            for (MetatraderTick tick : ticks) {
+//                try {
+//                    System.out.println(" tick updated " + asJson(tick));
+//                } catch (JsonProcessingException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            return CompletableFuture.completedFuture(null);
+//        }
+//
+//        @Override
+//        public CompletableFuture<Void> onBooksUpdated(String instanceIndex, List<MetatraderBook> books,
+//                                                      Double equity, Double margin, Double freeMargin, Double marginLevel, Double accountCurrencyExchangeRate) {
+//            for (MetatraderBook book : books) {
+//                try {
+//                    System.out.println(" order book updated " + asJson(book));
+//                } catch (JsonProcessingException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            return CompletableFuture.completedFuture(null);
+//        }
+//
+//        @Override
+//        public CompletableFuture<Void> onSubscriptionDowngraded(String instanceIndex, String symbol,
+//                                                                List<MarketDataSubscription> updates, List<MarketDataUnsubscription> unsubscriptions) {
+//            System.out.println("Market data subscriptions for " + symbol
+//                    + " were downgraded by the server due to rate limits");
+//            return CompletableFuture.completedFuture(null);
+//        }
+//    }
+//
+//    private static String asJson(Object object) throws JsonProcessingException {
+//        return JsonMapper.getInstance().writeValueAsString(object);
 //    }
 
 

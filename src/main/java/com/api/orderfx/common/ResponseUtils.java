@@ -8,4 +8,9 @@ public class ResponseUtils {
     public BaseResponse created() {
         return new BaseResponse(EnumCodeResponse.SUCCESS);
     }
+
+    public BaseResponse internalServer() {
+        return new BaseResponse(EnumCodeResponse.INTERNAL_SERVER);
+    }
+
 }

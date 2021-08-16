@@ -3,7 +3,7 @@
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout
-                    pattern="%style{%d{ISO8601}}{black} %highlight{%-5level }[%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable" />
+                    pattern="%style{%d{ISO8601}}{black} %highlight{%-5level }[%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable"/>
         </Console>
 
         <RollingFile name="RollingFile"
@@ -15,24 +15,38 @@
             <Policies>
                 <!-- rollover on startup, daily and when the file reaches
                     10 MegaBytes -->
-                <OnStartupTriggeringPolicy />
+                <OnStartupTriggeringPolicy/>
                 <SizeBasedTriggeringPolicy
-                        size="10 MB" />
-                <TimeBasedTriggeringPolicy />
+                        size="10 MB"/>
+                <TimeBasedTriggeringPolicy/>
             </Policies>
         </RollingFile>
     </Appenders>
 
     <Loggers>
-        <!-- LOG everything at INFO level -->
-        <Logger name="com.api.orderfx" additivity="false">
-            <AppenderRef ref="RollingFile" />
-            <AppenderRef ref="Console" />
-        </Logger>
+<!--        &lt;!&ndash; LOG everything at INFO level &ndash;&gt;-->
+<!--        <Logger name="com.api.orderfx" additivity="false">-->
+<!--            <AppenderRef ref="Console"/>-->
+<!--            <AppenderRef ref="RollingFile"/>-->
+<!--        </Logger>-->
 
-        <Root level="info">
-            <AppenderRef ref="Console" />
-        </Root>
+<!--        <Root level="info">-->
+<!--            <AppenderRef ref="Console" />-->
+<!--            <AppenderRef ref="RollingFile"/>-->
+<!--        </Root>-->
+
+
+        <!-- LOG everything at INFO level -->
+        <root level="debug">
+            <appender-ref ref="Console" />
+        </root>
+
+        <logger name="com.api.orderfx" level="trace" additivity="false">
+            <appender-ref ref="Console" />
+            <appender-ref ref="RollingFile" />
+
+        </logger>
+
     </Loggers>
 
 </Configuration>

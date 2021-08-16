@@ -2,25 +2,27 @@ package com.api.orderfx.model.fxcm.request;
 
 import lombok.Data;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
 import java.util.List;
 
 @Data
 public class CreateOrderRequest {
 
-    public Boolean isBuy;
+    private String broker;
 
-    public List<Double> limit;
+    private Boolean isBuy;
 
-    public Double stop;
+    private List<Double> limit;
 
-    public String symbols;
+    private Double stop;
 
-    public Double price;
+    private String symbols;
 
-    public Double amount;
+    private Double price;
 
-    public Double offset;
+    private Double amount;
+
+    private Double offset;
+
+    private Long channelId;
 
 }

@@ -116,7 +116,27 @@
             <version>1.7.0</version>
         </dependency>
 
-
+        <dependency>
+            <groupId>cloud.metaapi.sdk</groupId>
+            <artifactId>metaapi-java-sdk</artifactId>
+            <version>[13.2.0,)</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.konghq/unirest-java -->
+        <dependency>
+            <groupId>com.konghq</groupId>
+            <artifactId>unirest-java</artifactId>
+            <version>3.11.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.4.2.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>1.4.2.Final</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -130,6 +150,10 @@
                         <exclude>
                             <groupId>org.projectors</groupId>
                             <artifactId>lombok</artifactId>
+                        </exclude>
+                        <exclude>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct</artifactId>
                         </exclude>
                     </excludes>
                     <mainClass>com.api.orderfx.OrderFxApplication</mainClass>

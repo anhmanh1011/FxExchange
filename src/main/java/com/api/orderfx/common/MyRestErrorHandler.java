@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class MyRestErrorHandler implements ResponseErrorHandler {
+
     @Override
     public boolean hasError(ClientHttpResponse clientHttpResponse) throws IOException {
         HttpStatus status = clientHttpResponse.getStatusCode();

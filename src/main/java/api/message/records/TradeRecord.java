@@ -1,7 +1,11 @@
 package api.message.records;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.json.simple.JSONObject;
 
+@Data
+@NoArgsConstructor
 public class TradeRecord extends WrapperTradeRecord {
 
 	private long timestamp;

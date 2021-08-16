@@ -1,9 +1,10 @@
 package api.message.records;
 
+import lombok.Data;
 import org.json.simple.JSONObject;
 
 import api.message.codes.STREAMING_TRADE_TYPE;
-
+@Data
 public class STradeRecord extends WrapperTradeRecord {
 
 	private STREAMING_TRADE_TYPE type;

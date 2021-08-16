@@ -14,14 +14,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 @Slf4j
 public class ControllerAdvisor extends ResponseEntityExceptionHandler {
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> customHandleException(
-            Exception ex, WebRequest request) {
-        log.error("ex: " + JsonUtils.ObjectToJson(ex));
-        return new ResponseEntity<>(new BaseResponse(HttpStatus.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     @ExceptionHandler(BaseException.class)
     public ResponseEntity customHandleBaseException(
             BaseException ex, WebRequest request) {
@@ -30,6 +22,14 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
         baseResponse.setMessage(ex.getMessage());
         return new ResponseEntity<>(baseResponse, HttpStatus.OK);
 
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> customHandleException(
+            Exception ex, WebRequest request) {
+        ex.printStackTrace();
+        log.error("ex: " + JsonUtils.ObjectToJson(ex));
+        return new ResponseEntity<>(new BaseResponse(HttpStatus.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 

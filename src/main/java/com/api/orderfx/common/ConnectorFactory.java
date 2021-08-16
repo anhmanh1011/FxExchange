@@ -45,6 +45,7 @@ public class ConnectorFactory {
         }
         log.info("get Connector: " + JsonUtils.ObjectToJson(loginResponse));
         if (connector == null) {
+            log.error("Không thể kết nối đến broker");
             throw new BaseException(HttpStatus.SERVICE_UNAVAILABLE.value(), "Không thể kết nối đến broker");
         }
         return connector;

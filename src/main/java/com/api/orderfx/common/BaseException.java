@@ -11,7 +11,12 @@ public class BaseException extends Exception {
     String message;
 
     public BaseException(int code, String message) {
-        super(message);
+        this.message = message;
         this.code = code;
+    }
+
+    public BaseException(EnumCodeResponse enumCodeResponse) {
+        this.code = enumCodeResponse.getCode();
+        this.message = enumCodeResponse.getDescription();
     }
 }
