@@ -37,12 +37,12 @@
 
 
         <!-- LOG everything at INFO level -->
-        <root level="debug">
+        <root level="info">
             <appender-ref ref="RollingFile" />
 
         </root>
 
-        <logger name="com.api.orderfx" level="info" additivity="false">
+        <logger name="com.api.orderfx" additivity="false">
             <appender-ref ref="Console" />
 
         </logger>
