@@ -38,12 +38,12 @@
 
         <!-- LOG everything at INFO level -->
         <root level="debug">
-            <appender-ref ref="Console" />
+            <appender-ref ref="RollingFile" />
+
         </root>
 
-        <logger name="com.api.orderfx" level="trace" additivity="false">
+        <logger name="com.api.orderfx" level="info" additivity="false">
             <appender-ref ref="Console" />
-            <appender-ref ref="RollingFile" />
 
         </logger>
 

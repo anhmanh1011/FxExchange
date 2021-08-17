@@ -78,7 +78,9 @@ public class MetaApiSocketConnect {
     }
 
     private static String asJson(Object object) throws JsonProcessingException {
+
         return JsonMapper.getInstance().writeValueAsString(object);
     }
+
 
 }
