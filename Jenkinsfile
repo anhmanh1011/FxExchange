@@ -27,8 +27,6 @@ pipeline {
         }
         stage('build_docker') {
             steps {
-                sh('docker rmi order_fx')
-
                 sh('docker build -t order_fx .')
             }
         }
@@ -60,6 +58,7 @@ pipeline {
                 }
 
                 sh(script: 'docker run  --name order_fx -d -p 8090:8090 -v /home:/logs order_fx', returnStdout: true)
+                sh(script: 'docker rmi $(docker images -f "dangling=true" -q)', returnStdout: true)
             }
         }
 
