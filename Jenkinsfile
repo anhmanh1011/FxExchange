@@ -27,6 +27,8 @@ pipeline {
         }
         stage('build_docker') {
             steps {
+                sh('docker rmi order_fx')
+
                 sh('docker build -t order_fx .')
             }
         }
