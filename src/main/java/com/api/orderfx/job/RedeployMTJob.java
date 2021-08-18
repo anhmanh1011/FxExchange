@@ -12,8 +12,7 @@ public class RedeployMTJob {
 
     @Autowired
     MetaApiSocketConnect metaApiSocketConnect;
-
-    @Scheduled(fixedDelay = 1000 * 60 * 15)
+    @Scheduled(fixedDelay = 1000 * 60 * 15, initialDelay = 1000 * 60 * 15)
     public void redeployMtJob() {
         if (metaApiSocketConnect != null) {
             boolean connected = metaApiSocketConnect.connection.getTerminalState().isConnected();
