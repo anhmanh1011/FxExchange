@@ -25,21 +25,24 @@
                 <TimeBasedTriggeringPolicy/>
             </Policies>
         </RollingFile>
+
+        <Async name="Async" bufferSize="262144">
+            <AppenderRef ref="socketAppender"/>
+            <AppenderRef ref="RollingFile"/>
+            <LinkedTransferQueue/>
+        </Async>
     </Appenders>
 
     <Loggers>
 
         <root level="info">
-            <appender-ref ref="socketAppender"/>
-            <appender-ref ref="Console"/>
 
+            <appender-ref ref="Console"/>
+            <appender-ref ref="Async"/>
         </root>
 
         <logger name="com.api.orderfx" additivity="false">
-            <appender-ref ref="socketAppender"/>
-            <appender-ref ref="RollingFile"/>
-
-
+            <appender-ref ref="Async"/>
         </logger>
 
     </Loggers>
