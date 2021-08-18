@@ -47,12 +47,12 @@ public class XTBSocketConnect {
     @Autowired
     BeanUtilsBean beanUtilsBean;
 
-
     @Autowired
     ConnectorFactory connectorFactory;
 
     @Autowired
     PositionMapper positionMapper;
+
     @Autowired
     PositionInfoRepository positionInfoRepository;
 
