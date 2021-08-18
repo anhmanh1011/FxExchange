@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
     <Appenders>
+        <Socket name="socketAppender" host="172.17.0.1" port="5000">
+            <JSONLog4j2Layout singleLine="true"/>
+        </Socket>
+
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout
                     pattern="%style{%d{ISO8601}}{black} %highlight{%-5level }[%style{%t}{bright,blue}] %style{%C{1.}}{bright,yellow}: %msg%n%throwable"/>
@@ -8,7 +12,7 @@
 
         <RollingFile name="RollingFile"
                      fileName="./logs/spring-boot-logger-log4j2.log"
-                     filePattern="./logs/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i.log">
+                     filePattern="./logs/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}.log">
             <PatternLayout>
                 <pattern>%d %p %C{1.} [%t] %m%n%d</pattern>
             </PatternLayout>
@@ -24,26 +28,17 @@
     </Appenders>
 
     <Loggers>
-<!--        &lt;!&ndash; LOG everything at INFO level &ndash;&gt;-->
-<!--        <Logger name="com.api.orderfx" additivity="false">-->
-<!--            <AppenderRef ref="Console"/>-->
-<!--            <AppenderRef ref="RollingFile"/>-->
-<!--        </Logger>-->
 
-<!--        <Root level="info">-->
-<!--            <AppenderRef ref="Console" />-->
-<!--            <AppenderRef ref="RollingFile"/>-->
-<!--        </Root>-->
-
-
-        <!-- LOG everything at INFO level -->
         <root level="info">
-            <appender-ref ref="RollingFile" />
+            <appender-ref ref="socketAppender"/>
+            <appender-ref ref="Console"/>
 
         </root>
 
         <logger name="com.api.orderfx" additivity="false">
-            <appender-ref ref="Console" />
+            <appender-ref ref="socketAppender"/>
+            <appender-ref ref="RollingFile"/>
+
 
         </logger>
 

@@ -59,7 +59,7 @@ public class SynchronizationImpl extends SynchronizationListener {
         try {
             String symbol = price.symbol;
             System.out.println(symbol + " price updated " + asJson(price));
-
+            log.info(symbol + " price updated " + asJson(price));
             List<ProfitManagementInfoEntity> profits = profitManagementRepository.getAllBySymbolsAndStatusAndClosedIsFalse(symbol, EStatusTrade.POSITION_SUCCESS);
             List<PositionInfoEntity> positionInfoEntities = positionInfoRepository.getAllBySymbolAndStatusAndClosedIsFalse(symbol, EStatusTrade.POSITION_SUCCESS);
 
