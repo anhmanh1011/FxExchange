@@ -2,6 +2,7 @@
 <Configuration>
     <Appenders>
         <Socket name="socketAppender" host="172.17.0.1" port="5000">
+<!--        <Socket name="socketAppender" host="localhost" port="5000">-->
             <JSONLog4j2Layout singleLine="true"/>
         </Socket>
 
