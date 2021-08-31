@@ -3,14 +3,12 @@ package com.api.orderfx.service.meta_api;
 import api.message.error.APICommandConstructionException;
 import api.message.error.APICommunicationException;
 import api.message.error.APIReplyParseException;
-import api.message.records.TradeTransInfoRecord;
 import api.message.response.APIErrorResponse;
 import api.message.response.SymbolResponse;
 import cloud.metaapi.sdk.clients.meta_api.models.MarketTradeOptions;
 import cloud.metaapi.sdk.clients.meta_api.models.MetatraderPosition;
 import cloud.metaapi.sdk.clients.meta_api.models.MetatraderTradeResponse;
 import cloud.metaapi.sdk.meta_api.MetaApiConnection;
-import com.api.orderfx.ApplicationListener.MetaApiSocketConnect;
 import com.api.orderfx.Utils.JsonUtils;
 import com.api.orderfx.Utils.SortUtils;
 import com.api.orderfx.common.*;
@@ -32,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -52,25 +51,26 @@ public class BdsApiImpl implements ITradeApi {
 
     @Autowired
     SymbolsSubscribeRepository symbolsSubscribeRepository;
+    @Autowired
+    MetaApiConnectorFactory metaApiConnectorFactory;
 
     @Override
     @Transactional
     public BaseResponse openPosition(CreateOrderRequest createOrderRequest) throws BaseException {
 
-        MetaApiConnection connection = MetaApiSocketConnect.getConnection();
         ETransactionType eTransactionType;
         SymbolsSubscribeEntity symbolsSubscribeEntity = symbolsSubscribeRepository.getByChannelIdAndSymbol(createOrderRequest.getChannelId(), createOrderRequest.getSymbols());
 
         String symbolBroker;
-        String symbolSub;
         if (symbolsSubscribeEntity != null) {
             symbolBroker = symbolsSubscribeEntity.getSymbolBroker();
-            symbolSub = symbolsSubscribeEntity.getSymbolSubscribe();
         } else {
-            symbolBroker = symbolSub = createOrderRequest.getSymbols();
+            symbolBroker = createOrderRequest.getSymbols();
         }
-
+        MetaApiConnection connection = null;
         try {
+            connection = metaApiConnectorFactory.getConnection();
+
             MetatraderTradeResponse metatraderTradeResponse;
 
             if (createOrderRequest.getIsBuy()) {
@@ -130,17 +130,21 @@ public class BdsApiImpl implements ITradeApi {
         } catch (ExecutionException e) {
             e.printStackTrace();
             log.error(JsonUtils.ObjectToJson(e));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null)
+                connection.close();
         }
         throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
     }
 
     @Override
     public BaseResponse modifyPosition(ModifyOrderRequest modifyOrderRequest) throws APIErrorResponse, APIReplyParseException, APICommunicationException, APICommandConstructionException, BaseException {
-        MetaApiConnection connection = MetaApiSocketConnect.getConnection();
-
+        MetaApiConnection connection = null;
         try {
             PositionInfoEntity entity;
-
+            connection = metaApiConnectorFactory.getConnection();
             if (modifyOrderRequest.getPositionId() != null) {
                 entity = positionInfoRepository.findPositionInfoEntityByPositionId(modifyOrderRequest.getPositionId());
             } else if (modifyOrderRequest.getChannelId() != null && modifyOrderRequest.getPrice() != null && modifyOrderRequest.getPrice() > 0) {
@@ -169,16 +173,19 @@ public class BdsApiImpl implements ITradeApi {
             ex.printStackTrace();
             log.error(JsonUtils.ObjectToJson(ex));
             throw new BaseException(EnumCodeResponse.INTERNAL_SERVER);
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
         }
     }
 
     @Override
     public BaseResponse closePosition(CloseOrderRequest closeOrderRequest) throws APIErrorResponse, APIReplyParseException, APICommunicationException, APICommandConstructionException, BaseException {
-        MetaApiConnection connection = MetaApiSocketConnect.getConnection();
-
+        MetaApiConnection connection = null;
         try {
             PositionInfoEntity entity;
-
+            connection = metaApiConnectorFactory.getConnection();
             if (closeOrderRequest.getPositionId() != null) {
                 entity = positionInfoRepository.findPositionInfoEntityByPositionId(closeOrderRequest.getPositionId());
             } else if (closeOrderRequest.getChannelId() != null && closeOrderRequest.getPrice() != null && closeOrderRequest.getPrice() > 0) {
@@ -207,6 +214,10 @@ public class BdsApiImpl implements ITradeApi {
             ex.printStackTrace();
             log.error(JsonUtils.ObjectToJson(ex));
             throw new BaseException(EnumCodeResponse.INTERNAL_SERVER);
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
         }
     }
 

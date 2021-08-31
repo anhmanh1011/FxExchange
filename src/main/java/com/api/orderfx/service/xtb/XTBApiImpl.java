@@ -11,7 +11,6 @@ import api.message.response.APIErrorResponse;
 import api.message.response.SymbolResponse;
 import api.message.response.TradeTransactionResponse;
 import api.sync.SyncAPIConnector;
-import com.api.orderfx.ApplicationListener.MetaApiSocketConnect;
 import com.api.orderfx.Utils.JsonUtils;
 import com.api.orderfx.Utils.SortUtils;
 import com.api.orderfx.Utils.TimeUtils;
@@ -121,16 +120,16 @@ public class XTBApiImpl implements ITradeApi {
                 positionInfoEntity.setType(eTransactionType);
                 positionInfoEntity.setPrice(createOrderRequest.getPrice());
                 positionInfoEntity.setBrokerName(BrokerCode.XTB_EXCHANGE);
-                positionInfoEntity.setStatus(EStatusTrade.POSITION_PENDING);
+                positionInfoEntity.setStatus(EStatusTrade.POSITION_SUCCESS);
                 positionInfoEntity.setChannelId(createOrderRequest.getChannelId());
+                positionInfoEntity.setStopLoss(createOrderRequest.getStop());
                 positionInfoRepository.save(positionInfoEntity);
-                try {
-                    MetaApiSocketConnect.connection.subscribeToMarketData(symbolSub);
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    log.error(JsonUtils.ObjectToJson(ex));
-                }
+//                try {
+//                    MetaApiSocketConnect.connection.subscribeToMarketData(symbolSub);
+//                } catch (Exception ex) {
+//                    ex.printStackTrace();
+//                    log.error(JsonUtils.ObjectToJson(ex));
+//                }
 
                 // insert profit management
                 ProfitManagementInfoEntity profitManagementInfo = new ProfitManagementInfoEntity();
@@ -143,7 +142,7 @@ public class XTBApiImpl implements ITradeApi {
                 profitManagementInfo.setIsBuy(createOrderRequest.getIsBuy());
                 profitManagementInfo.setSymbols(createOrderRequest.getSymbols());
                 profitManagementInfo.setOrderId(positionInfoEntity.getOrderId());
-                profitManagementInfo.setStatus(EStatusTrade.POSITION_PENDING);
+                profitManagementInfo.setStatus(EStatusTrade.POSITION_SUCCESS);
                 profitManagementRepository.save(profitManagementInfo);
                 return ResponseUtils.created();
             }
