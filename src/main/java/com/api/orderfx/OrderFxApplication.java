@@ -4,6 +4,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.TimeZone;
+
 @SpringBootApplication
 @EnableScheduling
 public class OrderFxApplication {
@@ -12,7 +17,7 @@ public class OrderFxApplication {
         SpringApplication.run(OrderFxApplication.class, args);
     }
 
-//    private static String symbol = getEnvOrDefault("SYMBOL", "EURUSD");
+    //    private static String symbol = getEnvOrDefault("SYMBOL", "EURUSD");
 //    private static String token = getEnvOrDefault("TOKEN", "gHevelEGc2mk4As6FzSvBp4aiPPEtEcHQzoJlunpqPi0blK26B5sHUaTun3ToTQZ");
 //    private static String accountId = getEnvOrDefault("ACCOUNT_ID", "ac738a46-c3c8-4c43-a65b-d34f66f2d3ba");
 //
@@ -140,6 +145,19 @@ public class OrderFxApplication {
 //    private static String asJson(Object object) throws JsonProcessingException {
 //        return JsonMapper.getInstance().writeValueAsString(object);
 //    }
+    @PostConstruct
+    public void init() {
 
+//		String[] id = TimeZone.getAvailableIDs();
+//		System.out.println("Danh sach id co san la: ");
+//		for (int i = 0; i < id.length; i++) {
+//			System.out.println(id[i]);
+//		}
+
+        // Setting Spring Boot SetTimeZone
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+        System.out.println(new Date());
+        System.out.println(LocalDateTime.now());
+    }
 
 }
