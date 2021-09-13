@@ -15,7 +15,7 @@
     <description>Demo project for Spring Boot</description>
     <properties>
         <java.version>11</java.version>
-
+        <spring-boot.run.jvmArguments>-Duser.timezone=Asia/Ho_Chi_Minh</spring-boot.run.jvmArguments>
         <maven.test.skip>true</maven.test.skip>
         <maven.compiler.version>3.8.1</maven.compiler.version>
         <lombok.version>1.18.8</lombok.version>
