@@ -1,5 +1,7 @@
 package com.api.orderfx;
 
+import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -11,6 +13,7 @@ import java.util.TimeZone;
 
 @SpringBootApplication
 @EnableScheduling
+@Log4j2
 public class OrderFxApplication {
 
     public static void main(String[] args) {
@@ -158,6 +161,9 @@ public class OrderFxApplication {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
         System.out.println(new Date());
         System.out.println(LocalDateTime.now());
+
+        log.info("DATE: " + new Date());
+        log.info("LocalDateTime: " + LocalDateTime.now());
     }
 
 }
